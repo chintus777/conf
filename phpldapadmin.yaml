@@ -1,0 +1,47 @@
+##This yaml file is for integration of phpldapadmin portal 
+##Add this in your abcdesktop.yaml or run this file separately after running abcdesktop.yaml
+##Phpldapadmin portal provides an easy interactive UI for user management with openldap server.
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: phpldapadmin
+  namespace: vdi
+spec:
+  selector:
+    app: phpldapadmin
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpldapadmin
+  namespace: vdi
+spec:
+  selector:
+    matchLabels:
+      app: phpldapadmin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: phpldapadmin
+    spec:
+      containers:
+      - name: phpldapadmin
+        image: osixia/phpldapadmin:0.9.0
+        ports:
+        - containerPort: 80
+        env:
+        - name: PHPLDAPADMIN_LDAP_HOSTS
+          value: "openldap.vdi.svc.cluster.local"
+        - name: PHPLDAPADMIN_HTTPS
+          value: "false"
+        - name: PHPLDAPADMIN_LDAP_PORT
+          value: "389"
+        - name: PHPLDAPADMIN_BASE_DN
+          value: "dc=company,dc=com"
